@@ -25,3 +25,4 @@ typing-extensions==3.7.2
 pep8-naming==0.7.0
 pytest==4.2.1
 pytest-cov==2.5.1
+attrs==19.1.0
