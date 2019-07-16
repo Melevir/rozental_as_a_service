@@ -4,6 +4,7 @@ from typing import List, Tuple
 import requests
 
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
+from rozental_as_a_service.db_utils import save_ya_speller_results_to_db
 
 
 def process_with_vocabulary(
@@ -24,16 +25,18 @@ def process_with_ya_speller(
         config: BackendsConfig,
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
     typos_info: List[TypoInfo] = []
-    speller_result = requests.get(
+    response = requests.get(
         'https://speller.yandex.net/services/spellservice.json/checkTexts',
         params={'lang': 'ru', 'text': words},
-    ).json()
+    )
+    speller_result = response.json()
     if speller_result:
-        for word_info, word in zip(speller_result, words):
+        for word_info in speller_result:
             if word_info and word_info[0]['s']:
                 typos_info.append({
-                    'original': word,
+                    'original': word_info[0]['word'],
                     'possible_options': word_info[0]['s'],
                 })
+        save_ya_speller_results_to_db(speller_result, words, config['db_path'])
     typo_words = {t['original'] for t in typos_info}
     return [], typos_info, [w for w in words if w not in typo_words]
