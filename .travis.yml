@@ -8,8 +8,6 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - flake8 .
-  - mypy .
-  - python -m pytest --cov=rozental_as_a_service --cov-report=xml
+  - make check
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
