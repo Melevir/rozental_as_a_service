@@ -1,8 +1,9 @@
 import argparse
 import ast
+import logging
 import math
 import re
-from typing import List
+from typing import List, Generator
 
 import requests
 from mypy_extensions import TypedDict
@@ -14,9 +15,9 @@ class TypoInfo(TypedDict):
     possible_options: List[str]
 
 
-def chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+def chunks(some_list: List, chunk_size: int) -> Generator:
+    for chunk_num in range(0, len(some_list), chunk_size):
+        yield some_list[chunk_num:chunk_num + chunk_size]
 
 
 def parse_args() -> argparse.Namespace:
@@ -50,7 +51,7 @@ def fetch_typos_info(string_constants: List[str], chunk_size: int = 100) -> List
     typos_info: List[TypoInfo] = []
     chunks_amount = math.ceil(len(string_constants) / chunk_size)
     for chunk_num, words_chunk in enumerate(chunks(string_constants, chunk_size)):
-        print(f'Processing chunk {chunk_num} of {chunks_amount}...')
+        logging.debug(f'Processing chunk {chunk_num} of {chunks_amount}...')
         speller_result = requests.get(
             'https://speller.yandex.net/services/spellservice.json/checkTexts',
             params={'lang': 'ru', 'text': words_chunk},
@@ -66,7 +67,7 @@ def fetch_typos_info(string_constants: List[str], chunk_size: int = 100) -> List
 
 
 def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russian: bool = True) -> List[str]:
-    processed_words = []
+    processed_words: List[str] = []
     for constant in string_constants:
         processed_words += list({
             w.strip().lower() for w in re.findall(r'\w+', constant)
@@ -85,4 +86,4 @@ if __name__ == '__main__':
     typos_info = fetch_typos_info(unique_words)
 
     table = [t.values() for t in typos_info]
-    print(tabulate(table))
+    print(tabulate(table))  # noqa
