@@ -3,21 +3,18 @@ import ast
 import logging
 import math
 import re
-from typing import List, Generator
+from typing import List
 
 import requests
 from mypy_extensions import TypedDict
 from tabulate import tabulate
 
+from rozental_as_a_service.list_utils import chunks
+
 
 class TypoInfo(TypedDict):
     original: str
     possible_options: List[str]
-
-
-def chunks(some_list: List, chunk_size: int) -> Generator:
-    for chunk_num in range(0, len(some_list), chunk_size):
-        yield some_list[chunk_num:chunk_num + chunk_size]
 
 
 def parse_args() -> argparse.Namespace:

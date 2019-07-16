@@ -23,3 +23,5 @@ mypy==0.701
 typing==3.6.4
 typing-extensions==3.7.2
 pep8-naming==0.7.0
+pytest==4.2.1
+pytest-cov==2.5.1

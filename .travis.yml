@@ -10,5 +10,6 @@ before_script:
 script:
   - flake8 .
   - mypy .
+  - python -m pytest --cov=flake8_class_attributes_order --cov-report=xml
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
