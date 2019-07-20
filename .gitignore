@@ -119,3 +119,4 @@ pyvenv.cfg
 pip-selfcheck.json
 
 .idea/
+.rozental.sqlite
