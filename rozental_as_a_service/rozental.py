@@ -87,9 +87,9 @@ def main() -> None:
     unique_words = extract_words(string_constants)
     typos_info = fetch_typos_info(unique_words, vocabulary_path, db_path)
 
-    table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]
-    print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
     if typos_info:
+        table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]
+        print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
         exit(1)
 
 
