@@ -4,7 +4,7 @@ from typing import List, Tuple
 import requests
 
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
-from rozental_as_a_service.db_utils import save_ya_speller_results_to_db
+from rozental_as_a_service.db_utils import save_ya_speller_results_to_db, get_ya_speller_cache_from_db
 
 
 def process_with_vocabulary(
@@ -20,10 +20,34 @@ def process_with_vocabulary(
     return list(correct_words), [], [w for w in words if w not in correct_words]
 
 
+def process_with_db_with_cache(
+        words: List[str],
+        config: BackendsConfig,
+) -> Tuple[List[str], List[TypoInfo], List[str]]:
+    words_cache = get_ya_speller_cache_from_db(words, config['db_path'])
+    sure_correct_words: List[str] = []
+    incorrect_typos_info: List[TypoInfo] = []
+    for word in words:
+        if word not in words_cache:
+            continue
+        cached_value = words_cache[word]
+        if cached_value is None:
+            sure_correct_words.append(word)
+        else:
+            incorrect_typos_info.append({
+                'original': word,
+                'possible_options': cached_value,
+            })
+    known_words = set(sure_correct_words + [t['original'] for t in incorrect_typos_info])
+    return sure_correct_words, incorrect_typos_info, list(set(words) - known_words)
+
+
 def process_with_ya_speller(
         words: List[str],
         config: BackendsConfig,
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
+    if not words:
+        return [], [], words
     typos_info: List[TypoInfo] = []
     response = requests.get(
         'https://speller.yandex.net/services/spellservice.json/checkTexts',

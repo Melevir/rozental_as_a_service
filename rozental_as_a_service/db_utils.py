@@ -1,7 +1,7 @@
 import json
 import os
 import sqlite3
-from typing import List, Mapping, Any, Tuple, Optional
+from typing import List, Mapping, Any, Tuple, Optional, Dict
 
 
 def save_ya_speller_results_to_db(
@@ -18,6 +18,16 @@ def save_ya_speller_results_to_db(
     insert_db_words_info(new_results, connection)
 
 
+def get_ya_speller_cache_from_db(
+    words: List[str],
+    db_path: str,
+) -> Dict[str, Optional[List[str]]]:
+    if not os.path.exists(db_path):
+        return {}
+    connection = sqlite3.connect(db_path)
+    return fetch_words_info_from_db(words, connection)
+
+
 def create_db(db_path: str) -> None:
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
@@ -32,6 +42,15 @@ def get_existing_words_in_db(words: List[str], connection: sqlite3.Connection) -
         words,
     ).fetchall()
     return [r[0] for r in raw_result]
+
+
+def fetch_words_info_from_db(words: List[str], connection: sqlite3.Connection) -> Dict[str, Optional[List[str]]]:
+    cursor = connection.cursor()
+    raw_result = cursor.execute(
+        'SELECT word, ya_speller_hints_json FROM words WHERE word IN ({0})'.format(','.join('?' * len(words))),
+        words,
+    ).fetchall()
+    return {r: json.loads(info) for r, info in raw_result}
 
 
 def insert_db_words_info(data: List[Tuple[str, Optional[Mapping]]], connection: sqlite3.Connection) -> None:

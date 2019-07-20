@@ -13,6 +13,7 @@ from rozental_as_a_service.config import (
 from rozental_as_a_service.list_utils import chunks
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
+    process_with_db_with_cache,
 )
 
 
@@ -29,6 +30,7 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str, db_path:
 
     backends = [
         process_with_vocabulary,
+        process_with_db_with_cache,
         process_with_ya_speller,
     ]
     backend_config: BackendsConfig = {
