@@ -62,7 +62,7 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
     return processed_words
 
 
-def main():
+def main() -> None:
     arguments = parse_args()
     vocabulary_path = arguments.vocabulary_path or os.path.join(arguments.path, DEFAULT_VOCABULARY_FILENAME)
     db_path = arguments.db_path or os.path.join(arguments.path, DEFAULT_SQLITE_DB_FILENAME)
