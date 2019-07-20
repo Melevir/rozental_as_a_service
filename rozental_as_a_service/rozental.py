@@ -75,5 +75,6 @@ def main():
     if typos_info:
         exit(1)
 
+
 if __name__ == '__main__':
     main()
