@@ -51,7 +51,7 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str, db_path:
 
 def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russian: bool = True) -> List[str]:
     processed_words: List[str] = []
-    for constant in string_constants:
+    for constant in raw_constants:
         processed_words += list({
             w.strip().lower() for w in re.findall(r'\w+', constant)
             if len(w.strip()) >= min_word_length
@@ -62,7 +62,7 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
     return processed_words
 
 
-if __name__ == '__main__':
+def main():
     arguments = parse_args()
     vocabulary_path = arguments.vocabulary_path or os.path.join(arguments.path, DEFAULT_VOCABULARY_FILENAME)
     db_path = arguments.db_path or os.path.join(arguments.path, DEFAULT_SQLITE_DB_FILENAME)
@@ -74,3 +74,6 @@ if __name__ == '__main__':
     print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
     if typos_info:
         exit(1)
+
+if __name__ == '__main__':
+    main()
