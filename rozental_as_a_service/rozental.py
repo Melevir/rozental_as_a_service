@@ -22,11 +22,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('path', type=str)
     parser.add_argument('--vocabulary_path', default=None)
+    parser.add_argument('--exclude', default='')
     parser.add_argument('--db_path', default=None)
     return parser.parse_args()
 
 
-def extract_all_constants_from_path(path: str) -> List[str]:
+def extract_all_constants_from_path(path: str, exclude: List[str]) -> List[str]:
     extractors = [
         (extract_from_python_src, ['py']),
         (extract_from_markdown, ['md']),
@@ -35,7 +36,7 @@ def extract_all_constants_from_path(path: str) -> List[str]:
     string_constants: List[str] = []
     for extractor_callable, extensions in extractors:
         for extension in extensions:
-            for filepath in get_all_filepathes_recursively(path, extension):
+            for filepath in get_all_filepathes_recursively(path, exclude, extension):
                 with open(filepath, 'r') as file_handler:
                     raw_content = file_handler.read()
                 string_constants += extractor_callable(raw_content)
@@ -83,7 +84,8 @@ def main() -> None:
     arguments = parse_args()
     vocabulary_path = arguments.vocabulary_path or os.path.join(arguments.path, DEFAULT_VOCABULARY_FILENAME)
     db_path = arguments.db_path or os.path.join(arguments.path, DEFAULT_SQLITE_DB_FILENAME)
-    string_constants = extract_all_constants_from_path(arguments.path)
+    exclude = arguments.exclude.split(',') if arguments.exclude else []
+    string_constants = extract_all_constants_from_path(arguments.path, exclude)
     unique_words = extract_words(string_constants)
     typos_info = fetch_typos_info(unique_words, vocabulary_path, db_path)
 
