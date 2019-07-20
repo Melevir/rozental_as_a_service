@@ -43,7 +43,7 @@ def extract_all_constants_from_path(path: str, exclude: List[str]) -> List[str]:
     return list(set(string_constants))
 
 
-def fetch_typos_info(string_constants: List[str], vocabulary_path: str, db_path: str) -> List[TypoInfo]:
+def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, db_path: str = None) -> List[TypoInfo]:
     typos_info: List[TypoInfo] = []
 
     backends = [

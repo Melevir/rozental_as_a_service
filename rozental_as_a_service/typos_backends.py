@@ -11,7 +11,7 @@ def process_with_vocabulary(
         words: List[str],
         config: BackendsConfig,
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
-    if not os.path.exists(config['vocabulary_path']):
+    if config['vocabulary_path'] is None or not os.path.exists(config['vocabulary_path']):
         return [], [], words
     with open(config['vocabulary_path']) as file_handler:
         raw_vocabulary = file_handler.readlines()
@@ -24,6 +24,8 @@ def process_with_db_with_cache(
         words: List[str],
         config: BackendsConfig,
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
+    if config['db_path'] is None:
+        return [], [], words
     words_cache = get_ya_speller_cache_from_db(words, config['db_path'])
     sure_correct_words: List[str] = []
     incorrect_typos_info: List[TypoInfo] = []
@@ -61,6 +63,7 @@ def process_with_ya_speller(
                     'original': word_info[0]['word'],
                     'possible_options': word_info[0]['s'],
                 })
-        save_ya_speller_results_to_db(speller_result, words, config['db_path'])
+        if config['db_path'] is not None:
+            save_ya_speller_results_to_db(speller_result, words, config['db_path'])
     typo_words = {t['original'] for t in typos_info}
     return [], typos_info, [w for w in words if w not in typo_words]
