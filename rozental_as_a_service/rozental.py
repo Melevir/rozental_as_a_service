@@ -5,7 +5,6 @@ from typing import List
 
 from tabulate import tabulate
 
-from rozental_as_a_service.ast_utils import extract_all_constants_from_path
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import (
     DEFAULT_WORDS_CHUNK_SIZE, DEFAULT_VOCABULARY_FILENAME, DEFAULT_SQLITE_DB_FILENAME,
@@ -15,6 +14,8 @@ from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
 )
+from rozental_as_a_service.files_utils import get_all_filepathes_recursively
+from rozental_as_a_service.strings_extractors import extract_from_python_src, extract_from_markdown
 
 
 def parse_args() -> argparse.Namespace:
@@ -23,6 +24,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--vocabulary_path', default=None)
     parser.add_argument('--db_path', default=None)
     return parser.parse_args()
+
+
+def extract_all_constants_from_path(path: str) -> List[str]:
+    extractors = [
+        (extract_from_python_src, ['py']),
+        (extract_from_markdown, ['md']),
+    ]
+
+    string_constants: List[str] = []
+    for extractor_callable, extensions in extractors:
+        for extension in extensions:
+            for filepath in get_all_filepathes_recursively(path, extension):
+                with open(filepath, 'r') as file_handler:
+                    raw_content = file_handler.read()
+                string_constants += extractor_callable(raw_content)
+    return list(set(string_constants))
 
 
 def fetch_typos_info(string_constants: List[str], vocabulary_path: str, db_path: str) -> List[TypoInfo]:

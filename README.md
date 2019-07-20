@@ -36,7 +36,7 @@
 
     def start_ad_company(company: Company) -> bool:
         if company.owner.total_budget < company.budget:
-            company.owner.send_message('Для содание рекламной компаниии надостаточно бджета')
+            company.owner.send_message('Для содание рекламной компании недостаточно бджета')
             return False
         ...
 

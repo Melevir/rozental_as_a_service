@@ -30,7 +30,13 @@ setup(
     version=get_version(),
     author='Ilya Lebedev',
     author_email='melevir@gmail.com',
-    install_requires=['setuptools', 'tabulate>=0.8', 'requests>=2.22.0'],
+    install_requires=[
+        'setuptools',
+        'tabulate>=0.8',
+        'requests>=2.22.0',
+        'Markdown>=3.1.1',
+        'beautifulsoup4>=4.8.0',
+    ],
     entry_points={
         'console_scripts': [
             'rozental = rozental_as_a_service.rozental:main',
