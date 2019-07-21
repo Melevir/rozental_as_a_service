@@ -17,8 +17,12 @@ def extract_from_python_src(raw_content: str) -> List[str]:
     return extract_all_constants_from_ast(ast_tree)
 
 
+def extract_from_html(raw_content: str) -> List[str]:
+    return BeautifulSoup(raw_content, 'html.parser').find_all(text=True)
+
+
 def extract_from_markdown(raw_content: str) -> List[str]:
     html = markdown(raw_content)
     html = re.sub(r'<pre>(.*?)</pre>', ' ', html)
     html = re.sub(r'<code>(.*?)</code >', ' ', html)
-    return BeautifulSoup(html, 'html.parser').find_all(text=True)
+    return extract_from_html(html)

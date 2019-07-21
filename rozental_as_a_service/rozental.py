@@ -17,11 +17,13 @@ from rozental_as_a_service.typos_backends import (
     process_with_db_with_cache,
 )
 from rozental_as_a_service.files_utils import get_all_filepathes_recursively
-from rozental_as_a_service.strings_extractors import extract_from_python_src, extract_from_markdown
-
+from rozental_as_a_service.strings_extractors import (
+    extract_from_python_src, extract_from_markdown, extract_from_html,
+)
 
 log = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.getLogger('urllib3').setLevel(logging.INFO)
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,6 +41,7 @@ def extract_all_constants_from_path(path: str, exclude: List[str]) -> List[str]:
     extractors = [
         (extract_from_python_src, ['py']),
         (extract_from_markdown, ['md']),
+        (extract_from_html, ['html']),
     ]
 
     string_constants: List[str] = []
