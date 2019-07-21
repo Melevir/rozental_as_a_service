@@ -1,6 +1,8 @@
 import argparse
+import logging
 import os
 import re
+import sys
 from typing import List
 
 from tabulate import tabulate
@@ -18,12 +20,18 @@ from rozental_as_a_service.files_utils import get_all_filepathes_recursively
 from rozental_as_a_service.strings_extractors import extract_from_python_src, extract_from_markdown
 
 
+log = logging.getLogger(__name__)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('path', type=str)
     parser.add_argument('--vocabulary_path', default=None)
     parser.add_argument('--exclude', default='')
     parser.add_argument('--db_path', default=None)
+    parser.add_argument('-v', action='count', default=0)
+
     return parser.parse_args()
 
 
@@ -35,10 +43,13 @@ def extract_all_constants_from_path(path: str, exclude: List[str]) -> List[str]:
 
     string_constants: List[str] = []
     for extractor_callable, extensions in extractors:
+        log.debug(f'Extractor {extractor_callable.__name__} working...')
         for extension in extensions:
             for filepath in get_all_filepathes_recursively(path, exclude, extension):
+                log.debug(f'Start reading {filepath}...')
                 with open(filepath, 'r') as file_handler:
                     raw_content = file_handler.read()
+                log.debug(f'Start processing {filepath}...')
                 string_constants += extractor_callable(raw_content)
     return list(set(string_constants))
 
@@ -85,6 +96,8 @@ def main() -> None:
     vocabulary_path = arguments.vocabulary_path or os.path.join(arguments.path, DEFAULT_VOCABULARY_FILENAME)
     db_path = arguments.db_path or os.path.join(arguments.path, DEFAULT_SQLITE_DB_FILENAME)
     exclude = arguments.exclude.split(',') if arguments.exclude else []
+    log.setLevel(max(3 - arguments.v, 0) * 10)
+
     string_constants = extract_all_constants_from_path(arguments.path, exclude)
     unique_words = extract_words(string_constants)
     typos_info = fetch_typos_info(unique_words, vocabulary_path, db_path)
