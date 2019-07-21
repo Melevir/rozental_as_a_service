@@ -10,7 +10,10 @@ from rozental_as_a_service.ast_utils import extract_all_constants_from_ast
 
 
 def extract_from_python_src(raw_content: str) -> List[str]:
-    ast_tree = ast.parse(raw_content)
+    try:
+        ast_tree = ast.parse(raw_content)
+    except SyntaxError:
+        return []
     return extract_all_constants_from_ast(ast_tree)
 
 
