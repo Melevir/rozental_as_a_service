@@ -1,6 +1,5 @@
 requests==2.22.0
 tabulate==0.8.3
-requests>=2.22.0
 Markdown>=3.1.1
 beautifulsoup4>=4.8.0
 esprima==4.0.1
