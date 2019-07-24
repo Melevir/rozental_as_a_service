@@ -15,7 +15,7 @@ from rozental_as_a_service.ast_utils import extract_all_constants_from_ast
 def extract_from_python_src(raw_content: str) -> List[str]:
     return list(set(
         _extract_from_python_ast(raw_content)
-        + _extract_from_python_code_comments(raw_content)
+        + _extract_from_python_code_comments(raw_content),
     ))
 
 
