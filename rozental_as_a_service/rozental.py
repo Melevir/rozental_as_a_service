@@ -19,6 +19,7 @@ from rozental_as_a_service.typos_backends import (
 from rozental_as_a_service.files_utils import get_all_filepathes_recursively
 from rozental_as_a_service.strings_extractors import (
     extract_from_python_src, extract_from_markdown, extract_from_html,
+    extract_from_js,
 )
 
 log = logging.getLogger(__name__)
@@ -42,6 +43,7 @@ def extract_all_constants_from_path(path: str, exclude: List[str]) -> List[str]:
         (extract_from_python_src, ['py']),
         (extract_from_markdown, ['md']),
         (extract_from_html, ['html']),
+        (extract_from_js, ['js', 'ts', 'tsx']),
     ]
 
     string_constants: List[str] = []

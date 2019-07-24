@@ -5,6 +5,7 @@ from typing import List
 
 from bs4 import BeautifulSoup
 from markdown import markdown
+from esprima import tokenize, Error
 
 from rozental_as_a_service.ast_utils import extract_all_constants_from_ast
 
@@ -26,3 +27,11 @@ def extract_from_markdown(raw_content: str) -> List[str]:
     html = re.sub(r'<pre>(.*?)</pre>', ' ', html)
     html = re.sub(r'<code>(.*?)</code>', ' ', html)
     return extract_from_html(html)
+
+
+def extract_from_js(raw_content: str) -> List[str]:
+    try:
+        tokens = tokenize(raw_content)
+    except Error:
+        return []
+    return list({t.value for t in tokens if t.type == 'String'})
