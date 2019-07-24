@@ -1,21 +1,22 @@
 import ast
+import io
 import re
 
 from typing import List
+import tokenize
 
 from bs4 import BeautifulSoup
 from markdown import markdown
-from esprima import tokenize, Error
+from esprima import tokenize as esprima_tokenize, Error
 
 from rozental_as_a_service.ast_utils import extract_all_constants_from_ast
 
 
 def extract_from_python_src(raw_content: str) -> List[str]:
-    try:
-        ast_tree = ast.parse(raw_content)
-    except SyntaxError:
-        return []
-    return extract_all_constants_from_ast(ast_tree)
+    return list(set(
+        _extract_from_python_ast(raw_content)
+        + _extract_from_python_code_comments(raw_content)
+    ))
 
 
 def extract_from_html(raw_content: str) -> List[str]:
@@ -31,7 +32,23 @@ def extract_from_markdown(raw_content: str) -> List[str]:
 
 def extract_from_js(raw_content: str) -> List[str]:
     try:
-        tokens = tokenize(raw_content)
+        tokens = esprima_tokenize(raw_content)
     except Error:
         return []
     return list({t.value for t in tokens if t.type == 'String'})
+
+
+def _extract_from_python_ast(raw_content: str) -> List[str]:
+    try:
+        ast_tree = ast.parse(raw_content)
+    except SyntaxError:
+        return []
+    return extract_all_constants_from_ast(ast_tree)
+
+
+def _extract_from_python_code_comments(raw_content: str) -> List[str]:
+    string_constants = []
+    for line in tokenize.generate_tokens(io.StringIO(raw_content).readline):
+        if line.type == tokenize.COMMENT:
+            string_constants.append(line.string)
+    return string_constants
