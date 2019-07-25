@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--vocabulary_path', default=None)
     parser.add_argument('--exclude', default='')
     parser.add_argument('--db_path', default=None)
+    parser.add_argument('--exit_zero', action='store_true')
     parser.add_argument('-v', action='count', default=0)
 
     return parser.parse_args()
@@ -110,7 +111,8 @@ def main() -> None:
     if typos_info:
         table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]
         print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
-        exit(1)
+        if not arguments.exit_zero:
+            exit(1)
 
 
 if __name__ == '__main__':
