@@ -11,3 +11,14 @@ class BackendsConfig(TypedDict):
     speller_chunk_size: int
     vocabulary_path: Optional[str]
     db_path: Optional[str]
+
+
+class RozentalOptions(TypedDict):
+    path: str
+    config_path: str
+    vocabulary_path: str
+    exclude: List[str]
+    db_path: str
+    exit_zero: bool
+    processes_amount: int
+    verbosity: int

@@ -1,20 +1,17 @@
-import argparse
 import collections
 import functools
 import logging
 import math
 import multiprocessing
-import os
 import re
 import sys
 from typing import List, Callable, DefaultDict
 
 from tabulate import tabulate
 
+from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
-from rozental_as_a_service.config import (
-    DEFAULT_WORDS_CHUNK_SIZE, DEFAULT_VOCABULARY_FILENAME, DEFAULT_SQLITE_DB_FILENAME,
-)
+from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
 from rozental_as_a_service.list_utils import chunks, flat
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
@@ -29,19 +26,6 @@ from rozental_as_a_service.strings_extractors import (
 log = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=str)
-    parser.add_argument('--vocabulary_path', default=None)
-    parser.add_argument('--exclude', default='')
-    parser.add_argument('--db_path', default=None)
-    parser.add_argument('--exit_zero', action='store_true')
-    parser.add_argument('--processes', type=int, default=None)
-    parser.add_argument('-v', action='count', default=0)
-
-    return parser.parse_args()
 
 
 def extract_all_constants_from_path(path: str, exclude: List[str], processes_amount: int) -> List[str]:
@@ -125,20 +109,22 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
 
 
 def main() -> None:
-    arguments = parse_args()
-    processes_amount = arguments.processes or multiprocessing.cpu_count()
-    vocabulary_path = arguments.vocabulary_path or os.path.join(arguments.path, DEFAULT_VOCABULARY_FILENAME)
-    db_path = arguments.db_path or os.path.join(arguments.path, DEFAULT_SQLITE_DB_FILENAME)
-    exclude = arguments.exclude.split(',') if arguments.exclude else []
-    log.setLevel(max(3 - arguments.v, 0) * 10)
+    script_arguments = parse_args()
+    arguments = prepare_arguments(script_arguments)
 
-    unique_words = extract_all_constants_from_path(arguments.path, exclude, processes_amount)
-    typos_info = fetch_typos_info(unique_words, vocabulary_path, db_path)
+    log.setLevel(max(3 - arguments['verbosity'], 0) * 10)
+
+    unique_words = extract_all_constants_from_path(
+        arguments['path'],
+        arguments['exclude'],
+        arguments['processes_amount'],
+    )
+    typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
 
     if typos_info:
         table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]
         print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
-        if not arguments.exit_zero:
+        if not arguments['exit_zero']:
             exit(1)
 
 
