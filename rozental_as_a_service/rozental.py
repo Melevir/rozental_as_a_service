@@ -30,7 +30,7 @@ logging.getLogger('urllib3').setLevel(logging.INFO)
 
 def extract_all_constants_from_path(path: str, exclude: List[str], processes_amount: int) -> List[str]:
     extractors = [
-        (extract_from_python_src, ['py']),
+        (extract_from_python_src, ['py', 'pyi']),
         (extract_from_markdown, ['md']),
         (extract_from_html, ['html']),
         (extract_from_js, ['js', 'ts', 'tsx']),
