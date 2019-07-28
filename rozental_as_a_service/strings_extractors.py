@@ -38,6 +38,16 @@ def extract_from_js(raw_content: str) -> List[str]:
     return list({t.value for t in tokens if t.type == 'String'})
 
 
+def extract_from_po(raw_content: str) -> List[str]:
+    text_regexp = r'(msgid|msgstr) "(.+)"'
+    extracted_text: List[str] = []
+    for line in raw_content.split('\n'):
+        match = re.match(text_regexp, line)
+        if match:
+            extracted_text.append(match.groups()[1])
+    return extracted_text
+
+
 def _extract_from_python_ast(raw_content: str) -> List[str]:
     try:
         ast_tree = ast.parse(raw_content)

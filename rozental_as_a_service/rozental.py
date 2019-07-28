@@ -21,7 +21,7 @@ from rozental_as_a_service.files_utils import get_all_filepathes_recursively, ge
 from rozental_as_a_service.strings_extractors import (
     extract_from_python_src, extract_from_markdown, extract_from_html,
     extract_from_js,
-)
+    extract_from_po)
 
 log = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -34,6 +34,7 @@ def extract_all_constants_from_path(path: str, exclude: List[str], processes_amo
         (extract_from_markdown, ['md']),
         (extract_from_html, ['html']),
         (extract_from_js, ['js', 'ts', 'tsx']),
+        (extract_from_po, ['po']),
     ]
 
     extension_to_extractor_mapping: DefaultDict[str, List[Callable]] = collections.defaultdict(list)
