@@ -15,7 +15,6 @@ class BackendsConfig(TypedDict):
 
 class RozentalOptions(TypedDict):
     path: str
-    config_path: str
     vocabulary_path: str
     exclude: List[str]
     db_path: str

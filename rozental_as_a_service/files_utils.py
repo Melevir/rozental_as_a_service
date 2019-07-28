@@ -4,6 +4,8 @@ from pathlib import Path
 
 from chardet import detect
 
+from rozental_as_a_service.config import DEFAULT_CONFIG_FILENAME
+
 
 def is_path_in_exclude_list(path: str, exclude: List[str]) -> bool:
     return any(e in path for e in exclude)
@@ -31,3 +33,11 @@ def get_content_from_file(filepath: str, guess_encoding: bool) -> Optional[str]:
                 return file_handler.read()
         except UnicodeDecodeError:
             return None
+
+
+def get_config_path(base_path: str, config_path: str = None) -> str:
+    if config_path and os.path.exists(config_path):
+        return config_path
+    default_config_path = os.path.join(base_path, DEFAULT_CONFIG_FILENAME)
+    if os.path.exists(default_config_path):
+        return default_config_path

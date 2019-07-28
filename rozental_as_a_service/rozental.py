@@ -114,6 +114,8 @@ def main() -> None:
 
     log.setLevel(max(3 - arguments['verbosity'], 0) * 10)
 
+    log.debug(f'Starting with following parameters: {arguments}')
+
     unique_words = extract_all_constants_from_path(
         arguments['path'],
         arguments['exclude'],
