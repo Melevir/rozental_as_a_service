@@ -20,7 +20,7 @@ from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
 )
-from rozental_as_a_service.files_utils import get_all_filepathes_recursively
+from rozental_as_a_service.files_utils import get_all_filepathes_recursively, get_content_from_file
 from rozental_as_a_service.strings_extractors import (
     extract_from_python_src, extract_from_markdown, extract_from_html,
     extract_from_js,
@@ -77,8 +77,11 @@ def extract_all_constants_from_files(files_pathes: List[str], extractors: List[C
     for filepath in files_pathes:
         for extractor_callable in extractors:
             log.debug(f'Start reading {filepath}...')
-            with open(filepath, 'r') as file_handler:
-                raw_content = file_handler.read()
+            raw_content = get_content_from_file(filepath, guess_encoding=False)
+            if raw_content is None:
+                raw_content = get_content_from_file(filepath, guess_encoding=True)
+            if raw_content is None:
+                return []
             log.debug(f'Start processing {filepath}...')
             string_constants += extractor_callable(raw_content)
     return extract_words(list(set(string_constants)))
