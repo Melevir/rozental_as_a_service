@@ -28,7 +28,12 @@ logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)
 
 
-def extract_all_constants_from_path(path: str, exclude: List[str], processes_amount: int) -> List[str]:
+def extract_all_constants_from_path(
+    path: str,
+    exclude: List[str],
+    process_dots: bool,
+    processes_amount: int,
+) -> List[str]:
     extractors = [
         (extract_from_python_src, ['py', 'pyi']),
         (extract_from_markdown, ['md']),
@@ -46,6 +51,8 @@ def extract_all_constants_from_path(path: str, exclude: List[str], processes_amo
 
     for extension, extension_extractors in extension_to_extractor_mapping.items():
         all_files = get_all_filepathes_recursively(path, exclude, extension)
+        if not process_dots:
+            all_files = [f for f in all_files if '/.' not in f]
         if not all_files:
             continue
         chunk_size = math.ceil(len(all_files) / processes_amount)
@@ -125,6 +132,7 @@ def main() -> None:
     unique_words = extract_all_constants_from_path(
         arguments['path'],
         arguments['exclude'],
+        arguments['process_dots'],
         arguments['processes_amount'],
     )
     typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
