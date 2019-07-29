@@ -107,7 +107,7 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
     processed_words: List[str] = []
     for constant in raw_constants:
         processed_words += list({
-            w.strip().lower() for w in re.findall(r'\w+', constant)
+            w.strip().lower() for w in re.findall(r'[\w-]+', constant)
             if len(w.strip()) >= min_word_length
         })
     processed_words = list(set(processed_words))
