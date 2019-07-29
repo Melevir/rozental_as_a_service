@@ -52,7 +52,7 @@ def extract_all_constants_from_path(
     for extension, extension_extractors in extension_to_extractor_mapping.items():
         all_files = get_all_filepathes_recursively(path, exclude, extension)
         if not process_dots:
-            all_files = [f for f in all_files if '/.' not in f]
+            all_files = [f for f in all_files if '/.' not in f and not f.startswith('.')]
         if not all_files:
             continue
         chunk_size = math.ceil(len(all_files) / processes_amount)
