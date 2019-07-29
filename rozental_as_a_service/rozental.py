@@ -105,7 +105,12 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
         })
     processed_words = list(set(processed_words))
     if only_russian:
-        processed_words = [w for w in processed_words if re.match(r'[а-я-]+', w)]
+        russian_words = []
+        for word in processed_words:
+            match = re.match(r'[а-яйё-]+', word)
+            if match:
+                russian_words.append(match.group())
+        processed_words = russian_words
     return processed_words
 
 
