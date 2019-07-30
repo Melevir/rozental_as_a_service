@@ -105,8 +105,13 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, d
 
 
 def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russian: bool = True) -> List[str]:
+    common_replacements = [
+        ('\u0438\u0306', 'й'),  # некоторые редакторы записывают й как "и" и "̆'"
+    ]
     processed_words: List[str] = []
     for constant in raw_constants:
+        for replace_from, replace_to in common_replacements:
+            constant = constant.replace(replace_from, replace_to)
         processed_words += list({
             w.strip().lower() for w in re.findall(r'[\w-]+', constant)
             if len(w.strip()) >= min_word_length
@@ -115,7 +120,7 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
     if only_russian:
         russian_words = []
         for word in processed_words:
-            match = re.match(r'[а-яйё-]+', word)
+            match = re.match(r'[а-яё-]+', word)
             if match:
                 word = match.group()
                 if 'а-я' not in word:  # most likely regexp
