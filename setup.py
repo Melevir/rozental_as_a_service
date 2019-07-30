@@ -37,6 +37,7 @@ setup(
         'Markdown>=3.1.1',
         'beautifulsoup4>=4.8.0',
         'esprima==4.0.1',
+        'mypy-extensions=0.4.1',
     ],
     entry_points={
         'console_scripts': [
