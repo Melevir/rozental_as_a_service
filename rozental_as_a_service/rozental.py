@@ -3,6 +3,7 @@ import functools
 import logging
 import math
 import multiprocessing
+import os
 import re
 import sys
 from typing import List, Callable, DefaultDict
@@ -123,6 +124,33 @@ def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russi
     return processed_words
 
 
+def reorder_vocabulary(vocabulary_path: str) -> None:
+    with open(vocabulary_path, 'r') as file_handler:
+        raw_lines = file_handler.readlines()
+    sections: List[List[str]] = []
+    current_section: List[str] = []
+    for line in raw_lines:
+        processed_line = line.strip()
+        if not processed_line:
+            continue
+        if processed_line.startswith('#') and current_section:
+            sections.append(current_section)
+            current_section = []
+        current_section.append(processed_line)
+    if current_section:
+        sections.append(current_section)
+    sorted_sections: List[List[str]] = []
+    for section_num, section in enumerate(sections, 1):
+        sorted_sections.append(
+            [f'{l}\n' for l in section if l.startswith('#')]
+            + sorted(f'{l}\n' for l in section if not l.startswith('#'))
+            + (['\n'] if section_num < len(sections) else []),
+        )
+
+    with open(vocabulary_path, 'w') as file_handler:
+        file_handler.writelines(flat(sorted_sections))
+
+
 def main() -> None:
     script_arguments = parse_args()
     arguments = prepare_arguments(script_arguments)
@@ -138,6 +166,9 @@ def main() -> None:
         arguments['processes_amount'],
     )
     typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
+
+    if arguments['reorder_vocabulary'] and os.path.exists(arguments['vocabulary_path']):
+        reorder_vocabulary(arguments['vocabulary_path'])
 
     if typos_info:
         table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]

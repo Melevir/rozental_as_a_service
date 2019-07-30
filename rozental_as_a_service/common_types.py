@@ -19,6 +19,7 @@ class RozentalOptions(TypedDict):
     exclude: List[str]
     db_path: str
     exit_zero: bool
+    reorder_vocabulary: bool
     process_dots: bool
     processes_amount: int
     verbosity: int

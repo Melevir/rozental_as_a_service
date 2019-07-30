@@ -16,6 +16,8 @@ def get_params_from_config(config_path: str) -> Mapping[str, Any]:
         params['exclude'] = params['exclude'].split(',')  # type: ignore
     if 'exit_zero' in params:
         params['exit_zero'] = params['exit_zero'] == 'True'  # type: ignore
+    if 'reorder_vocabulary' in params:
+        params['reorder_vocabulary'] = params['reorder_vocabulary'] == 'True'  # type: ignore
     if 'process_dots' in params:
         params['process_dots'] = params['process_dots'] == 'True'  # type: ignore
     if 'verbosity' in params:
