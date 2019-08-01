@@ -31,16 +31,22 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
     if config_path:
         config = get_params_from_config(config_path)
 
-    processes_amount = argparse_args.processes or config.get('processes') or multiprocessing.cpu_count()
+    default_processors_amount = multiprocessing.cpu_count() if os.path.isdir(argparse_args.path) else 1
+    processes_amount = argparse_args.processes or config.get('processes') or default_processors_amount
+    base_path = (
+        argparse_args.path
+        if os.path.isdir(argparse_args.path)
+        else os.path.dirname(os.path.abspath(argparse_args.path))
+    )
     vocabulary_path = (
         argparse_args.vocabulary_path
         or config.get('vocabulary_path')
-        or os.path.join(argparse_args.path, DEFAULT_VOCABULARY_FILENAME)
+        or os.path.join(base_path, DEFAULT_VOCABULARY_FILENAME)
     )
     db_path = (
         argparse_args.db_path
         or config.get('db_path')
-        or os.path.join(argparse_args.path, DEFAULT_SQLITE_DB_FILENAME)
+        or os.path.join(base_path, DEFAULT_SQLITE_DB_FILENAME)
     )
     exclude = argparse_args.exclude.split(',') if argparse_args.exclude else config.get('exclude', [])
     exit_zero = argparse_args.exit_zero or config.get('exit_zero') or False

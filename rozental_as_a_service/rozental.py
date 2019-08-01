@@ -52,7 +52,10 @@ def extract_all_constants_from_path(
     string_constants: List[str] = []
 
     for extension, extension_extractors in extension_to_extractor_mapping.items():
-        all_files = get_all_filepathes_recursively(path, exclude, extension)
+        if os.path.isdir(path):
+            all_files = get_all_filepathes_recursively(path, exclude, extension)
+        else:
+            all_files = [path] if path.endswith(extension) else []
         if not process_dots:
             all_files = [f for f in all_files if '/.' not in f and not f.startswith('.')]
         if not all_files:
