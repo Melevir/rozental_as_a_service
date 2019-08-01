@@ -14,6 +14,7 @@ from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
 from rozental_as_a_service.list_utils import chunks, flat
+from rozental_as_a_service.text_utils import is_long_camel_case_word
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
@@ -104,28 +105,42 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, d
     return typos_info
 
 
-def extract_words(raw_constants: List[str], min_word_length: int = 3, only_russian: bool = True) -> List[str]:
+def extract_words(
+    raw_constants: List[str],
+    min_word_length: int = 3,
+    only_russian: bool = True,
+    strip_urls: bool = True,
+) -> List[str]:
     common_replacements = [
         ('\u0438\u0306', 'й'),  # некоторые редакторы записывают й как "и" и "̆'"
     ]
+    url_regexp = r'(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
     processed_words: List[str] = []
     for constant in raw_constants:
+        if strip_urls:
+            constant = re.sub(url_regexp, ' ', constant)
+
         for replace_from, replace_to in common_replacements:
             constant = constant.replace(replace_from, replace_to)
         processed_words += list({
             w.strip().lower() for w in re.findall(r'[\w-]+', constant)
-            if len(w.strip()) >= min_word_length
+            if (
+                len(w.strip()) >= min_word_length
+                and not is_long_camel_case_word(w.strip())
+                and not (w.strip().startswith('-') or w.strip().endswith('-'))
+            )
         })
     processed_words = list(set(processed_words))
-    if only_russian:
-        russian_words = []
-        for word in processed_words:
-            match = re.match(r'[а-яё-]+', word)
-            if match:
-                word = match.group()
-                if 'а-я' not in word:  # most likely regexp
-                    russian_words.append(word)
-        processed_words = russian_words
+
+    word_regexp = r'[а-яё-]+' if only_russian else r'[а-яёa-z-]+'
+    filtered_words = []
+    for word in processed_words:
+        match = re.match(word_regexp, word)
+        if match:
+            word = match.group()
+            if 'а-я' not in word and 'a-z' not in word:  # most likely regexp
+                filtered_words.append(word)
+    processed_words = filtered_words
     return processed_words
 
 

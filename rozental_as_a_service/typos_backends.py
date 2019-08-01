@@ -53,7 +53,7 @@ def process_with_ya_speller(
     typos_info: List[TypoInfo] = []
     response = requests.get(
         'https://speller.yandex.net/services/spellservice.json/checkTexts',
-        params={'lang': 'ru', 'text': words},
+        params={'text': words},
     )
     speller_result = response.json()
     if speller_result:
