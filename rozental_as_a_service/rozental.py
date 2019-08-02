@@ -115,7 +115,10 @@ def extract_words(
     strip_urls: bool = True,
 ) -> List[str]:
     common_replacements = [
-        ('\u0438\u0306', 'й'),  # некоторые редакторы записывают й как "и" и "̆'"
+        # remove diacritic symbols manually
+        ('\u0306', ''),
+        ('\u0301', ''),
+        ('\u0300', ''),
     ]
     url_regexp = r'(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
     processed_words: List[str] = []
