@@ -6,7 +6,7 @@ import multiprocessing
 import os
 import re
 import sys
-from typing import List, Callable, DefaultDict
+from typing import List, Callable, DefaultDict, Tuple
 
 from tabulate import tabulate
 
@@ -14,7 +14,7 @@ from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
 from rozental_as_a_service.list_utils import chunks, flat
-from rozental_as_a_service.text_utils import is_long_camel_case_word
+from rozental_as_a_service.text_utils import is_camel_case_word, split_camel_case_words
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
@@ -122,20 +122,19 @@ def extract_words(
     ]
     url_regexp = r'(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)'
     processed_words: List[str] = []
+    raw_camelcase_words: List[str] = []
     for constant in raw_constants:
         if strip_urls:
             constant = re.sub(url_regexp, ' ', constant)
 
         for replace_from, replace_to in common_replacements:
             constant = constant.replace(replace_from, replace_to)
-        processed_words += list({
-            w.strip().lower() for w in re.findall(r'[\w-]+', constant)
-            if (
-                len(w.strip()) >= min_word_length
-                and not is_long_camel_case_word(w.strip())
-                and not (w.strip().startswith('-') or w.strip().endswith('-'))
-            )
-        })
+
+        new_processed_words, new_camelcase_words = process_raw_constant(constant, min_word_length)
+        processed_words += new_processed_words
+        raw_camelcase_words += new_camelcase_words
+    processed_words += process_camelcased_words(raw_camelcase_words)
+
     processed_words = list(set(processed_words))
 
     word_regexp = r'[а-яё-]+' if only_russian else r'[а-яёa-z-]+'
@@ -147,6 +146,31 @@ def extract_words(
             if 'а-я' not in word and 'a-z' not in word:  # most likely regexp
                 filtered_words.append(word)
     processed_words = filtered_words
+    return processed_words
+
+
+def process_raw_constant(constant: str, min_word_length: int) -> Tuple[List[str], List[str]]:
+    processed_words: List[str] = []
+    raw_camelcase_words: List[str] = []
+    for raw_word in re.findall(r'[\w-]+', constant):
+        word = raw_word.strip()
+        if (
+            len(word) >= min_word_length
+            and not (word.startswith('-') or word.endswith('-'))
+        ):
+            if is_camel_case_word(word):
+                raw_camelcase_words.append(word)
+            else:
+                processed_words.append(word.lower())
+    return processed_words, raw_camelcase_words
+
+
+def process_camelcased_words(raw_camelcase_words: List[str]) -> List[str]:
+    processed_words: List[str] = []
+    for camel_case_words in raw_camelcase_words:
+        splitted_words = split_camel_case_words(camel_case_words)
+        if splitted_words:
+            processed_words += splitted_words
     return processed_words
 
 
