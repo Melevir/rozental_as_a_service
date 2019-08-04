@@ -30,4 +30,4 @@ pep8-naming==0.7.0
 pytest==4.2.1
 pytest-cov==2.5.1
 attrs==19.1.0
-rozental-as-a-service==0.0.7
+rozental-as-a-service==0.1.0

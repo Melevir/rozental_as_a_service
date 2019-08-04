@@ -13,7 +13,7 @@ def process_with_vocabulary(
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
     if config['vocabulary_path'] is None or not os.path.exists(config['vocabulary_path']):
         return [], [], words
-    with open(config['vocabulary_path']) as file_handler:
+    with open(config['vocabulary_path'], encoding='utf8') as file_handler:
         raw_vocabulary = file_handler.readlines()
     vocabulary = {w.strip().lower() for w in raw_vocabulary if not w.strip().startswith('#')}
     correct_words = {w for w in words if w in vocabulary}
