@@ -15,7 +15,7 @@ def get_version() -> Optional[str]:
 
 
 def get_long_description() -> str:
-    with open('README.md') as f:
+    with open('README.md', encoding='utf8') as f:
         return f.read()
 
 
@@ -37,7 +37,7 @@ setup(
         'Markdown>=3.1.1',
         'beautifulsoup4>=4.8.0',
         'esprima==4.0.1',
-        'mypy-extensions=0.4.1',
+        'mypy-extensions==0.4.1',
     ],
     entry_points={
         'console_scripts': [
