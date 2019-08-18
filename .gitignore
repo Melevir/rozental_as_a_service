@@ -120,3 +120,6 @@ pip-selfcheck.json
 
 .idea/
 .rozental.sqlite
+
+client_secrets.json
+token.pickle

@@ -1,5 +1,5 @@
 from mypy_extensions import TypedDict
-from typing import List, Optional
+from typing import List, Optional, Mapping, Any
 
 
 class TypoInfo(TypedDict):
@@ -23,3 +23,6 @@ class RozentalOptions(TypedDict):
     process_dots: bool
     processes_amount: int
     verbosity: int
+
+
+GoogleDocumentContent = Mapping[str, Any]
