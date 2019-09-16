@@ -1,0 +1,12 @@
+function getSecs() {
+	var mySecs = initStopwatch();
+	var mySecs1 = "123"+mySecs;
+	 /*
+    Многострочный
+    комментарий
+    */
+	mySecs1= mySecs1.substring(0,mySecs1.indexOf(".")) + " secs.";
+	document.forms[0].timespent.value = mySecs1
+	// Однострочный
+	window.setTimeout('getSecs()',1000);
+}
