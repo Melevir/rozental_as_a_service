@@ -69,13 +69,7 @@ def test_extract_from_js():
 
 def test_extract_from_po():
     src = _load_src_file('src_po')
-    actual_res = extr.extract_from_markdown(src)
-    expected_res = [
-        'Translators:',
-        '\n',
-        'msgid ""\nmsgstr ""',
-        '"Project-Id-Version: aimeos-core\\n"\nReport-Msgid-Bugs-To: \\n',
-        'msgid "AD"\nmsgstr "Андорра"',
-    ]
+    actual_res = extr.extract_from_po(src)
+    expected_res = ['AD', 'Андорра']
     for item in expected_res:
         assert item in actual_res
