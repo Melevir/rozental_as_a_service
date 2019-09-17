@@ -23,8 +23,8 @@ def test_extract_from_python_src():
         'val',
         'Дока',
     ]
-    for item in expected_res:
-        assert item in actual_res
+    for item in actual_res:
+        assert item in expected_res
 
 
 def test_extract_from_html_src():
@@ -36,8 +36,8 @@ def test_extract_from_html_src():
         ' Здесь <span>1</span> <br/>2 ',
         '\n',
     ]
-    for item in expected_res:
-        assert item in actual_res
+    for item in actual_res:
+        assert item in expected_res
 
 
 def test_extract_from_markdown_src():
@@ -50,8 +50,8 @@ def test_extract_from_markdown_src():
         '\n',
         'strong 55 77',
     ]
-    for item in expected_res:
-        assert item in actual_res
+    for item in actual_res:
+        assert item in expected_res
 
 
 def test_extract_from_js():
@@ -63,13 +63,13 @@ def test_extract_from_js():
         '"."',
         '"123"',
     ]
-    for item in expected_res:
-        assert item in actual_res
+    for item in actual_res:
+        assert item in expected_res
 
 
 def test_extract_from_po():
     src = _load_src_file('src_po')
     actual_res = extr.extract_from_po(src)
     expected_res = ['AD', 'Андорра']
-    for item in expected_res:
-        assert item in actual_res
+    for item in actual_res:
+        assert item in expected_res
