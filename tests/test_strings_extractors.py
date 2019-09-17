@@ -4,6 +4,8 @@ import rozental_as_a_service.strings_extractors as extr
 
 
 def _load_src_file(filename):
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    td_dir = os.path.join(cur_dir, 'test_files', 'src_for_strings_extractors')
     with open(os.path.join(td_dir, filename), encoding='utf8') as f:
         return f.read()
 
