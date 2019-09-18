@@ -48,6 +48,7 @@ def test_extract_from_markdown_src():
     actual_res = sorted(extr.extract_from_markdown(src))
     actual_res[-1] = actual_res[-1].strip()
     print('')
+    print(actual_res[-1])
     print(actual_res)
     exp_res = [
         '\n',
