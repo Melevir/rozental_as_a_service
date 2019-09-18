@@ -45,10 +45,12 @@ def test_extract_from_html_src():
 
 def test_extract_from_markdown_src():
     src = _load_src_file('src_markdown')
-    actual_res = sorted(extr.extract_from_markdown(src))
-    actual_res[-1] = actual_res[-1].strip()
-    print('')
+    actual_res = extr.extract_from_markdown(src)
     print(actual_res[-1])
+    actual_res[-1] = actual_res[-1].strip()
+    print(actual_res[-1])
+    actual_res = sorted(actual_res)
+    print('')
     print(actual_res)
     exp_res = [
         '\n',
