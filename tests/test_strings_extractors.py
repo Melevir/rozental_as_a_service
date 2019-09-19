@@ -1,4 +1,5 @@
 import os
+import sys
 
 import rozental_as_a_service.strings_extractors as extr
 
@@ -46,26 +47,21 @@ def test_extract_from_html_src():
 def test_extract_from_markdown_src():
     src = _load_src_file('src_markdown')
     actual_res = extr.extract_from_markdown(src)
-    print(actual_res[-1])
-    actual_res[-1] = actual_res[-1].strip()
-    print(actual_res[-1])
-    actual_res = sorted(actual_res)
-    print('')
     print(actual_res)
-    exp_res = [
-        '\n',
-        '\n',
-        '\n',
-        '\n',
-        '\n',
+    expected_res = [
         '\n',
         ' <title>Title</title> ',
-        ' Здесь <span>1</span> <br/>2 ',
+        '\n',
+        '\n',
         'Title',
-        'strong 55 77',
+        '\n',
+        ' Здесь <span>1</span> <br/>2 ',
     ]
-    print(exp_res)
-    assert actual_res == exp_res
+    if sys.platform == 'win32':
+        expected_res += ['\n', 'strong 55 77', '\n']
+    else:
+        expected_res += ['\n     \n     \n    strong 55 77\n']
+    assert actual_res == expected_res
 
 
 def test_extract_from_js():
