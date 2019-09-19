@@ -47,7 +47,6 @@ def test_extract_from_html_src():
 def test_extract_from_markdown_src():
     src = _load_src_file('src_markdown')
     actual_res = extr.extract_from_markdown(src)
-    print(actual_res)
     expected_res = [
         '\n',
         ' <title>Title</title> ',
