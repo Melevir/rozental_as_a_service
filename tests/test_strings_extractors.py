@@ -43,33 +43,9 @@ def test_extract_from_html_src():
     ]
 
 
-"""
 def test_extract_from_markdown_src():
     src = _load_src_file('src_markdown')
     actual_res = extr.extract_from_markdown(src)
-    expected_res = [
-        '\n',
-        ' <title>Title</title> ',
-        '\n',
-        '\n',
-        'Title',
-        '\n',
-        ' Здесь <span>1</span> <br/>2 ',
-    ]
-    if sys.platform == 'win32':
-        expected_res += ['\n', 'strong 55 77', '\n']
-    else:
-        expected_res += ['\n     \n     \n    strong 55 77\n']
-    assert actual_res == expected_res
-"""
-
-
-def test_extract_from_markdown_src1():
-    src = _load_src_file('src_markdown')
-    actual_res = extr.extract_from_markdown(src)
-    print('')
-    print(actual_res)
-
     assert actual_res == [
         ' <title>Title</title> ',
         ' ',
