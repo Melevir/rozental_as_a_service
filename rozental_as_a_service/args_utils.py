@@ -11,16 +11,44 @@ from rozental_as_a_service.files_utils import get_config_path
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', type=str)
-    parser.add_argument('--config', metavar='config_path')
-    parser.add_argument('--vocabulary_path')
-    parser.add_argument('--exclude', default='')
-    parser.add_argument('--db_path')
-    parser.add_argument('--exit_zero', action='store_true')
-    parser.add_argument('--reorder_vocabulary', action='store_true', help='reorder vocabulary in alphabetical order')
-    parser.add_argument('--process_dots', action='store_true', help='process dot-files and dot-directories')
-    parser.add_argument('--processes', type=int, default=None)
-    parser.add_argument('-v', action='count', default=0)
+    parser.add_argument(
+        'path',
+        type=str,
+        help='Путь до файла, который надо проверить.')
+    parser.add_argument(
+        '--config', '-c',
+        metavar='config_path',
+        help='Путь до файла с конфигурациями.')
+    parser.add_argument(
+        '--vocabulary_path', '-vp',
+        help='Путь до файла словаря.')
+    parser.add_argument(
+        '--exclude', '-e',
+        default='',
+        help='Список файлов/каталогов, которые следует исключить из проверки.')
+    parser.add_argument(
+        '--db_path', '-db',
+        help='Путь до sqlite базы с кешем. По умолчанию: .rozental.sqlite в корне проекта.')
+    parser.add_argument(
+        '--exit_zero', '-z',
+        action='store_true',
+        help='В любом случае завершать процесс без ошибки. Прим.: если вы не хотите ломать билд при наличии опечаток.')
+    parser.add_argument(
+        '--reorder_vocabulary', '-rv',
+        action='store_true',
+        help='Отсортировать словарь в алфавитном порядке.')
+    parser.add_argument(
+        '--process_dots', '-pd',
+        action='store_true',
+        help='Проверять файлы и директории, название которых начинается с точки. По-умолчанию они пропускаются.')
+    parser.add_argument(
+        '--processes', '-p',
+        type=int, default=None,
+        help='Количество процессов, которые будут использоваться для извлечения строк.')
+    parser.add_argument(
+        '-v', '--verbose',
+        action='count', default=0,
+        help='Более многословный режим.')
 
     return parser.parse_args()
 
