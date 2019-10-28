@@ -29,6 +29,7 @@ typing-extensions==3.7.2
 pep8-naming==0.7.0
 pytest==4.2.1
 pytest-cov==2.5.1
+Faker==2.0.3
 attrs==19.1.0
 rozental-as-a-service==0.1.0
 google-api-python-client==1.7.11
