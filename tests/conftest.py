@@ -10,6 +10,7 @@ fake = Faker()
 def fake_default_config_name():
     return fake.word()
 
+
 @pytest.fixture
 def fake_section_name():
     return fake.word()
