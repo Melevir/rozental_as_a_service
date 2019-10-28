@@ -35,7 +35,7 @@ def get_content_from_file(filepath: str, guess_encoding: bool) -> Optional[str]:
             return None
 
 
-def get_config_path(base_path: str, config_path: str = None) -> str:
+def get_config_path(base_path: str, config_path: str = None) -> Optional[str]:
     if config_path and os.path.exists(config_path):
         return config_path
     default_config_path = os.path.join(base_path, DEFAULT_CONFIG_FILENAME)
