@@ -28,6 +28,7 @@ def extract_from_markdown(raw_content: str) -> List[str]:
     html = re.sub(r'<pre>(.*?)</pre>', ' ', html)
     html = re.sub(r'<code>(.*?)</code>', ' ', html)
     html = re.sub(r'<strong>(.*?)</strong>', r'\1', html)
+    html = re.sub(r'\n', '', html)
     return extract_from_html(html)
 
 
