@@ -15,6 +15,7 @@ from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
 from rozental_as_a_service.extractors_utils import extract_words
 from rozental_as_a_service.gdocs_utils import is_google_doc_link, extract_all_constants_from_google_document
 from rozental_as_a_service.list_utils import chunks, flat
+from rozental_as_a_service.logging_urils import set_logging_level
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
@@ -25,9 +26,9 @@ from rozental_as_a_service.strings_extractors import (
     extract_from_js,
     extract_from_po)
 
-log = logging.getLogger(__name__)
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)
+log = logging.getLogger(__name__)
 
 
 def extract_all_constants_from_path(
@@ -35,6 +36,7 @@ def extract_all_constants_from_path(
     exclude: List[str],
     process_dots: bool,
     processes_amount: int,
+    verbosity: int = 0,
 ) -> List[str]:
     extractors = [
         (extract_from_python_src, ['py', 'pyi']),
@@ -62,14 +64,26 @@ def extract_all_constants_from_path(
             continue
         chunk_size = math.ceil(len(all_files) / processes_amount)
         new_strings = multiprocessing.Pool(processes_amount).map(
-            functools.partial(extract_all_constants_from_files, extractors=extension_extractors),
+            functools.partial(
+                extract_all_constants_from_files,
+                extractors=extension_extractors,
+                verbosity=verbosity,
+            ),
             chunks(all_files, chunk_size),
         )
         string_constants += flat(new_strings)
     return list(set(string_constants))
 
 
-def extract_all_constants_from_files(files_pathes: List[str], extractors: List[Callable]) -> List[str]:
+def extract_all_constants_from_files(
+    files_pathes: List[str],
+    extractors: List[Callable],
+    verbosity: int = 0,
+) -> List[str]:
+    log = logging.getLogger()
+    log.addHandler(logging.StreamHandler(sys.stdout))
+    set_logging_level(verbosity, log)
+
     string_constants: List[str] = []
     for filepath in files_pathes:
         for extractor_callable in extractors:
@@ -139,7 +153,7 @@ def main() -> None:
     script_arguments = parse_args()
     arguments = prepare_arguments(script_arguments)
 
-    log.setLevel(max(3 - arguments['verbosity'], 0) * 10)
+    set_logging_level(arguments['verbosity'], log)
 
     log.debug(f'Starting with following parameters: {arguments}')
 
@@ -151,6 +165,7 @@ def main() -> None:
             arguments['exclude'],
             arguments['process_dots'],
             arguments['processes_amount'],
+            arguments['verbosity'],
         )
 
     typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])

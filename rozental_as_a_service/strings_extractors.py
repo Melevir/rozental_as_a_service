@@ -59,7 +59,7 @@ def _extract_from_python_ast(raw_content: str) -> List[str]:
 
 def _extract_from_python_code_comments(raw_content: str) -> List[str]:
     string_constants = []
-    for line in tokenize.generate_tokens(io.StringIO(raw_content).readline):
+    for line in tokenize.generate_tokens(io.StringIO(raw_content).readline):  # type: ignore
         if line.type == tokenize.COMMENT:
             string_constants.append(line.string)
     return string_constants
