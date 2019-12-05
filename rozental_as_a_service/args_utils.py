@@ -81,7 +81,7 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
     )
     exclude = argparse_args.exclude.split(',') if argparse_args.exclude else config.get('exclude', [])
     exit_zero = argparse_args.exit_zero or config.get('exit_zero') or False
-    verbosity = argparse_args.v or config.get('v') or 0
+    verbosity = argparse_args.verbose or config.get('verbosity') or 0
     process_dots = argparse_args.process_dots or config.get('process_dots') or False
     reorder_vocabulary = argparse_args.reorder_vocabulary or config.get('reorder_vocabulary') or False
 

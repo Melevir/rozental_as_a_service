@@ -4,6 +4,7 @@ from typing import List, Tuple
 import requests
 
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
+from rozental_as_a_service.config import YA_SPELLER_REQUEST_TIMEOUTS
 from rozental_as_a_service.db_utils import save_ya_speller_results_to_db, get_ya_speller_cache_from_db
 
 
@@ -54,6 +55,7 @@ def process_with_ya_speller(
     response = requests.get(
         'https://speller.yandex.net/services/spellservice.json/checkTexts',
         params={'text': words},
+        timeout=YA_SPELLER_REQUEST_TIMEOUTS,
     )
     speller_result = response.json()
     if speller_result:
