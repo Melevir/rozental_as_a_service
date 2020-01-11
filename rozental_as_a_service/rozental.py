@@ -13,7 +13,6 @@ from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
 from rozental_as_a_service.extractors_utils import extract_words
-from rozental_as_a_service.gdocs_utils import is_google_doc_link, extract_all_constants_from_google_document
 from rozental_as_a_service.list_utils import chunks, flat
 from rozental_as_a_service.logging_urils import set_logging_level
 from rozental_as_a_service.typos_backends import (
@@ -157,16 +156,13 @@ def main() -> None:
 
     log.debug(f'Starting with following parameters: {arguments}')
 
-    if is_google_doc_link(arguments['path']):
-        unique_words = extract_all_constants_from_google_document(arguments['path'])
-    else:
-        unique_words = extract_all_constants_from_path(
-            arguments['path'],
-            arguments['exclude'],
-            arguments['process_dots'],
-            arguments['processes_amount'],
-            arguments['verbosity'],
-        )
+    unique_words = extract_all_constants_from_path(
+        arguments['path'],
+        arguments['exclude'],
+        arguments['process_dots'],
+        arguments['processes_amount'],
+        arguments['verbosity'],
+    )
 
     typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
 
