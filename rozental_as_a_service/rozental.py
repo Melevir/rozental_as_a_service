@@ -12,9 +12,13 @@ from tabulate import tabulate
 from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
+from rozental_as_a_service.db_utils import load_obscene_words
 from rozental_as_a_service.extractors_utils import extract_words
 from rozental_as_a_service.list_utils import chunks, flat
 from rozental_as_a_service.logging_urils import set_logging_level
+from rozental_as_a_service.obscene_utils import (
+    fetch_obscene_words_base_if_necessary,
+)
 from rozental_as_a_service.typos_backends import (
     process_with_vocabulary, process_with_ya_speller,
     process_with_db_with_cache,
@@ -165,6 +169,11 @@ def main() -> None:
     )
 
     typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
+    found_obscene_words = None
+    if arguments['ban_obscene_words']:
+        fetch_obscene_words_base_if_necessary(arguments['db_path'])
+        obscene_words = load_obscene_words(arguments['db_path'])
+        found_obscene_words = list(set(unique_words).intersection(obscene_words))
 
     if arguments['reorder_vocabulary'] and os.path.exists(arguments['vocabulary_path']):
         reorder_vocabulary(arguments['vocabulary_path'])
@@ -172,6 +181,9 @@ def main() -> None:
     if typos_info:
         table = [(t['original'], ', '.join(t['possible_options'])) for t in typos_info]
         print(tabulate(table, headers=('Найденное слово', 'Возможные исправления')))  # noqa
+
+        if found_obscene_words:
+            print(f'\n\nНайдены слова ненормативной лексики: {", ".join(found_obscene_words)}')  # noqa
         if not arguments['exit_zero']:
             exit(1)
 

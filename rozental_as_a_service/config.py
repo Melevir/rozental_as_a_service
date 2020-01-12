@@ -1,7 +1,9 @@
-DEFAULT_WORDS_CHUNK_SIZE = 100
+DEFAULT_WORDS_CHUNK_SIZE = 30
 DEFAULT_VOCABULARY_FILENAME = '.vocabulary'
 DEFAULT_SQLITE_DB_FILENAME = '.rozental.sqlite'
 DEFAULT_CONFIG_FILENAME = 'setup.cfg'
 CONFIG_SECTION_NAME = 'rozental'
 GOOGLE_DOC_URL_REGEXP = r'https://docs.google.com/document/d/([a-zA-Z0-9_-]+)/.+'
 YA_SPELLER_REQUEST_TIMEOUTS = (.5, .7)  # (connect timeout, read timeout)
+OBSCENE_BASE_TABLE_NAME = 'obscene_words'
+OBSCENE_CORPUS_HTTP_PATH = 'https://raw.githubusercontent.com/odaykhovskaya/obscene_words_ru/master/obscene_corpus.txt'

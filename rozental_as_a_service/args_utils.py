@@ -49,6 +49,10 @@ def parse_args() -> argparse.Namespace:
         '-v', '--verbose',
         action='count', default=0,
         help='Более многословный режим.')
+    parser.add_argument(
+        '--ban_obscene_words', '-obs',
+        action='store_true',
+        help='Считать вхождения мата за ошибки.')
 
     return parser.parse_args()
 
@@ -84,6 +88,7 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
     verbosity = argparse_args.verbose or config.get('verbosity') or 0
     process_dots = argparse_args.process_dots or config.get('process_dots') or False
     reorder_vocabulary = argparse_args.reorder_vocabulary or config.get('reorder_vocabulary') or False
+    ban_obscene_words = argparse_args.ban_obscene_words or config.get('ban_obscene_words') or False
 
     return {
         'path': argparse_args.path,
@@ -95,4 +100,5 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
         'process_dots': process_dots,
         'processes_amount': processes_amount,
         'verbosity': verbosity,
+        'ban_obscene_words': ban_obscene_words,
     }

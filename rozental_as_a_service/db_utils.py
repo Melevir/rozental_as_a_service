@@ -1,7 +1,10 @@
 import json
 import os
 import sqlite3
-from typing import List, Mapping, Any, Tuple, Optional, Dict
+from typing import List, Mapping, Any, Tuple, Optional, Dict, Set
+
+from rozental_as_a_service.config import OBSCENE_BASE_TABLE_NAME
+from rozental_as_a_service.list_utils import flat
 
 
 def save_ya_speller_results_to_db(
@@ -32,6 +35,7 @@ def create_db(db_path: str) -> None:
     connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     cursor.execute('CREATE TABLE words (word text, ya_speller_hints_json text)')
+    cursor.execute(f'CREATE TABLE {OBSCENE_BASE_TABLE_NAME} (word text)')
     connection.commit()
 
 
@@ -60,3 +64,46 @@ def insert_db_words_info(data: List[Tuple[str, Optional[Mapping]]], connection: 
         [(d[0], json.dumps(d[1]['s'] if d[1] else None)) for d in data],  # type: ignore
     )
     connection.commit()
+
+
+def is_table_exists(db_path: str, table_name: str) -> bool:
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    raw_result = cursor.execute(
+        f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';",
+    ).fetchall()
+    return bool(raw_result)
+
+
+def is_obscene_table_has_data(db_path: str) -> bool:
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    raw_result = cursor.execute(
+        f'SELECT count(*) FROM {OBSCENE_BASE_TABLE_NAME}',
+    ).fetchall()
+    return bool(raw_result[0][0])
+
+
+def create_obscene_base_table(db_path: str) -> None:
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.execute(f'CREATE TABLE {OBSCENE_BASE_TABLE_NAME} (word text)')
+    connection.commit()
+
+
+def save_obscene_words_to_db(db_path: str, obscene_words: List[str]) -> None:
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    cursor.executemany(
+        f'INSERT INTO {OBSCENE_BASE_TABLE_NAME} (word) VALUES (?)',
+        [[w] for w in obscene_words],
+    )
+    connection.commit()
+
+
+def load_obscene_words(db_path: str) -> Set[str]:
+    connection = sqlite3.connect(db_path)
+    cursor = connection.cursor()
+    return set(flat(cursor.execute(
+        f'SELECT word FROM {OBSCENE_BASE_TABLE_NAME}',
+    ).fetchall()))
