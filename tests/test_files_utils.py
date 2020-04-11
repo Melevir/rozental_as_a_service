@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch
 
-from tests.conftest import get_temp_file_path
+from conftest import get_temp_file_path
 from rozental_as_a_service.files_utils import get_config_path
 
 

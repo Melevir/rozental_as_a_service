@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import functools
 import logging
@@ -5,7 +7,6 @@ import math
 import multiprocessing
 import os
 import sys
-from typing import List, Callable, DefaultDict
 
 from tabulate import tabulate
 
@@ -28,6 +29,9 @@ from rozental_as_a_service.strings_extractors import (
     extract_from_python_src, extract_from_markdown, extract_from_html,
     extract_from_js,
     extract_from_po)
+
+if False:  # TYPE_CHECKING
+    from typing import List, Callable, DefaultDict
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)

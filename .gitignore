@@ -124,3 +124,7 @@ pip-selfcheck.json
 
 client_secrets.json
 token.pickle
+
+coverage*
+.coverage*
+.rozental.sqlite
