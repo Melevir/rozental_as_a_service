@@ -20,7 +20,7 @@ def extract_from_python_src(raw_content: str) -> List[str]:
 
 
 def extract_from_html(raw_content: str) -> List[str]:
-    return BeautifulSoup(raw_content, 'html.parser').find_all(text=True)
+    return [n.strip() for n in BeautifulSoup(raw_content, 'html.parser').find_all(text=True) if n.strip()]
 
 
 def extract_from_markdown(raw_content: str) -> List[str]:
@@ -28,7 +28,7 @@ def extract_from_markdown(raw_content: str) -> List[str]:
     html = re.sub(r'<pre>(.*?)</pre>', ' ', html)
     html = re.sub(r'<code>(.*?)</code>', ' ', html)
     html = re.sub(r'<strong>(.*?)</strong>', r'\1', html)
-    html = re.sub(r'\n', '', html)
+    html = re.sub(r'\n', ' ', html)
     return extract_from_html(html)
 
 

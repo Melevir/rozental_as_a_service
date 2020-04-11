@@ -30,16 +30,9 @@ def test_extract_from_html_src():
     src = _load_src_file('src_html')
     actual_res = sorted(extr.extract_from_html(src))
     assert actual_res == [
-        '\n',
-        '\n',
-        '\n',
-        '\n',
-        '\n',
-        '\n',
-        '\n',
-        ' <title>Title</title> ',
-        ' Здесь <span>1</span> <br/>2 ',
+        '<title>Title</title>',
         'Title',
+        'Здесь <span>1</span> <br/>2',
     ]
 
 
@@ -47,11 +40,11 @@ def test_extract_from_markdown_src():
     src = _load_src_file('src_markdown')
     actual_res = extr.extract_from_markdown(src)
     assert actual_res == [
-        ' <title>Title</title> ',
-        ' ',
-        'Title',
-        ' Здесь <span>1</span> <br/>2 ',
-        '              strong 55 77',
+        'Добрый день',
+        'Установка',
+        'pip install rozental_as_a_service',
+        'Также Розенталь поддерживает  -файл: текстовый файл с перечислением точно '
+        'верных слов. Это нужно для слов, специфичных для проекта',
     ]
 
 

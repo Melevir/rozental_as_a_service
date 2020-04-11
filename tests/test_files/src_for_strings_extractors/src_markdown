@@ -1,9 +1,9 @@
-<html lang="en">
-<!-- <title>Title</title> -->
-<head>
-    <title>Title</title>
-<!-- Здесь <span>1</span> <br/>2 -->
-    <pre>pre</pre>
-    <code>code</code>
-    <strong>strong 55 77</strong>
-</head></html>
+Добрый
+день
+
+## Установка
+
+    pip install rozental_as_a_service
+
+Также Розенталь поддерживает `.vocabulary`-файл: текстовый файл с
+перечислением точно верных слов. Это нужно для слов, специфичных для проекта

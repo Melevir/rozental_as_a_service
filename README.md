@@ -13,7 +13,7 @@
 ![Говорите и пишите по-русски правильно](https://raw.githubusercontent.com/Melevir/rozental_as_a_service/master/docs_img/rozental_book.jpg)
 
 
-**ВНИМАНИЕ**: Фамилия Розенталя на английском пишется так: Rosenthal, 
+**ВНИМАНИЕ**: Фамилия Розенталя на английском пишется так: Rosenthal,
 но эта библиотека называется `rozental`. Это не безграмотность, это метаирония. :)
 
 
@@ -33,7 +33,7 @@
 
     pip install rozental_as_a_service
 
-Для этого вам понадобится Python 3.6+. 
+Для этого вам понадобится Python 3.7+.
 
 
 ## Пример
@@ -85,7 +85,7 @@
 
 # Contributing
 
-Да, пожалуйста! 
+Да, пожалуйста!
 
 Мы соблюдаем [правила поведения Django](https://www.djangoproject.com/conduct/)
 и [стайлгайд BestDoctor](https://github.com/best-doctor/guides/blob/master/guides/python_styleguide.md).
