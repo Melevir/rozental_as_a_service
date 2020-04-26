@@ -1,8 +1,8 @@
 import os
 from typing import List, Tuple
 
-import requests
-from requests import Response
+from requests import Response, get
+from sentry_sdk import capture_exception
 
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
 from rozental_as_a_service.config import YA_SPELLER_REQUEST_TIMEOUTS, YA_SPELLER_RETRIES_COUNT
@@ -54,13 +54,13 @@ def process_with_ya_speller(
         return [], [], words
     for _ in range(YA_SPELLER_RETRIES_COUNT):
         try:
-            response = requests.get(
+            response = get(
                 'https://speller.yandex.net/services/spellservice.json/checkTexts',
                 params={'text': words},
                 timeout=YA_SPELLER_REQUEST_TIMEOUTS,
             )
-        except TimeoutError:
-            pass
+        except TimeoutError as e:
+            capture_exception(e)
         else:
             break
 
