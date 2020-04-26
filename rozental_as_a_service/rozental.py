@@ -9,10 +9,12 @@ import os
 import sys
 
 from tabulate import tabulate
+from sentry_sdk import init as init_sentry
+
 
 from rozental_as_a_service.args_utils import parse_args, prepare_arguments
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
-from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE
+from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE, SENTRY_ENABLED, SENTRY_URL
 from rozental_as_a_service.db_utils import load_obscene_words
 from rozental_as_a_service.extractors_utils import extract_words
 from rozental_as_a_service.list_utils import chunks, flat
@@ -28,7 +30,8 @@ from rozental_as_a_service.files_utils import get_all_filepathes_recursively, ge
 from rozental_as_a_service.strings_extractors import (
     extract_from_python_src, extract_from_markdown, extract_from_html,
     extract_from_js,
-    extract_from_po)
+    extract_from_po,
+)
 
 if False:  # TYPE_CHECKING
     from typing import List, Callable, DefaultDict
@@ -36,6 +39,10 @@ if False:  # TYPE_CHECKING
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)
 log = logging.getLogger(__name__)
+
+
+if SENTRY_ENABLED:
+    init_sentry(SENTRY_URL)
 
 
 def extract_all_constants_from_path(
@@ -120,6 +127,7 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, d
     }
     for words_chunk in chunks(string_constants, backend_config['speller_chunk_size']):
         for words_processor in backends:
+            log.debug(f'Using processor {words_processor} for words {words_chunk}')
             sure_correct, sure_with_typo_info, unknown = words_processor(words_chunk, backend_config)
             typos_info += sure_with_typo_info
             # переопределяем переменную цикла так, чтобы следующему процессору доставались

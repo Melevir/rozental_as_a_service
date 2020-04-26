@@ -2,9 +2,10 @@ import os
 from typing import List, Tuple
 
 import requests
+from requests import Response
 
 from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
-from rozental_as_a_service.config import YA_SPELLER_REQUEST_TIMEOUTS
+from rozental_as_a_service.config import YA_SPELLER_REQUEST_TIMEOUTS, YA_SPELLER_RETRIES_COUNT
 from rozental_as_a_service.db_utils import save_ya_speller_results_to_db, get_ya_speller_cache_from_db
 
 
@@ -51,12 +52,27 @@ def process_with_ya_speller(
 ) -> Tuple[List[str], List[TypoInfo], List[str]]:
     if not words:
         return [], [], words
+    for _ in range(YA_SPELLER_RETRIES_COUNT):
+        try:
+            response = requests.get(
+                'https://speller.yandex.net/services/spellservice.json/checkTexts',
+                params={'text': words},
+                timeout=YA_SPELLER_REQUEST_TIMEOUTS,
+            )
+        except TimeoutError:
+            pass
+        else:
+            break
+
+    return ([], *_process_ya_speller_response(response, words, config))
+
+
+def _process_ya_speller_response(
+    response: Response,
+    words: List[str],
+    config: BackendsConfig,
+) -> Tuple[List[TypoInfo], List[str]]:
     typos_info: List[TypoInfo] = []
-    response = requests.get(
-        'https://speller.yandex.net/services/spellservice.json/checkTexts',
-        params={'text': words},
-        timeout=YA_SPELLER_REQUEST_TIMEOUTS,
-    )
     speller_result = response.json()
     if speller_result:
         for word_info in speller_result:
@@ -68,4 +84,4 @@ def process_with_ya_speller(
         if config['db_path'] is not None:
             save_ya_speller_results_to_db(speller_result, words, config['db_path'])
     typo_words = {t['original'] for t in typos_info}
-    return [], typos_info, [w for w in words if w not in typo_words]
+    return typos_info, [w for w in words if w not in typo_words]

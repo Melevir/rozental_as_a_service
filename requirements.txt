@@ -1,8 +1,9 @@
-requests==2.23.0
-tabulate==0.8.3
+requests>=2.23.0
+tabulate>=0.8.3
 Markdown>=3.1.1
 beautifulsoup4>=4.8.0
-esprima==4.0.1
+esprima>=4.0.1
+sentry-sdk>=0.14.3
 
 pydocstyle==3.0.0
 flake8==3.7.9
