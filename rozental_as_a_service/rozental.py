@@ -68,10 +68,11 @@ def extract_all_constants_from_path(
     string_constants: List[str] = []
 
     for extension, extension_extractors in extension_to_extractor_mapping.items():
-        if os.path.isdir(path):
-            all_files = get_all_filepathes_recursively(path, exclude, extension)
-        else:
-            all_files = [path] if path.endswith(extension) else []
+        all_files = (
+            get_all_filepathes_recursively(path, exclude, extension)
+            if os.path.isdir(path)
+            else [path] if path.endswith(extension) else []
+        )
         if not process_dots:
             all_files = [f for f in all_files if '/.' not in f and not f.startswith('.')]
         if not all_files:
@@ -155,8 +156,8 @@ def reorder_vocabulary(vocabulary_path: str) -> None:
     sorted_sections: List[List[str]] = []
     for section_num, section in enumerate(sections, 1):
         sorted_sections.append(
-            [f'{l}\n' for l in section if l.startswith('#')]
-            + sorted(f'{l}\n' for l in section if not l.startswith('#'))
+            [f'{r}\n' for r in section if r.startswith('#')]
+            + sorted(f'{r}\n' for r in section if not r.startswith('#'))
             + (['\n'] if section_num < len(sections) else []),
         )
 

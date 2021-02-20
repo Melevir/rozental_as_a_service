@@ -65,14 +65,11 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
 
     default_processors_amount = multiprocessing.cpu_count() if os.path.isdir(argparse_args.path) else 1
     processes_amount = argparse_args.processes or config.get('processes') or default_processors_amount
-    if not os.path.exists(argparse_args.path):
-        base_path = '.'
-    else:
-        base_path = (
-            argparse_args.path
-            if os.path.isdir(argparse_args.path)
-            else os.path.dirname(os.path.abspath(argparse_args.path))
-        )
+    base_path = (
+        argparse_args.path
+        if os.path.isdir(argparse_args.path)
+        else os.path.dirname(os.path.abspath(argparse_args.path))
+    ) if os.path.exists(argparse_args.path) else '.'
     vocabulary_path = (
         argparse_args.vocabulary_path
         or config.get('vocabulary_path')
