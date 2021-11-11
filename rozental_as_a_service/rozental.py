@@ -13,7 +13,7 @@ from sentry_sdk import init as init_sentry
 
 
 from rozental_as_a_service.args_utils import parse_args, prepare_arguments
-from rozental_as_a_service.common_types import TypoInfo, BackendsConfig
+from rozental_as_a_service.common_types import TypoInfo
 from rozental_as_a_service.config import DEFAULT_WORDS_CHUNK_SIZE, SENTRY_ENABLED, SENTRY_URL
 from rozental_as_a_service.db_utils import load_obscene_words
 from rozental_as_a_service.extractors_utils import extract_words
@@ -23,8 +23,7 @@ from rozental_as_a_service.obscene_utils import (
     fetch_obscene_words_base_if_necessary,
 )
 from rozental_as_a_service.typos_backends import (
-    process_with_vocabulary, process_with_ya_speller,
-    process_with_db_with_cache,
+    process_with_vocabulary, YaSpellerBackend,
 )
 from rozental_as_a_service.files_utils import get_all_filepathes_recursively, get_content_from_file
 from rozental_as_a_service.strings_extractors import (
@@ -117,19 +116,13 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, d
     typos_info: List[TypoInfo] = []
 
     backends = [
-        process_with_vocabulary,
-        process_with_db_with_cache,
-        process_with_ya_speller,
+        functools.partial(process_with_vocabulary, vocabulary_path=vocabulary_path),
+        YaSpellerBackend(db_path=db_path),
     ]
-    backend_config: BackendsConfig = {
-        'vocabulary_path': vocabulary_path,
-        'db_path': db_path,
-        'speller_chunk_size': DEFAULT_WORDS_CHUNK_SIZE,
-    }
-    for words_chunk in chunks(string_constants, backend_config['speller_chunk_size']):
+    for words_chunk in chunks(string_constants, DEFAULT_WORDS_CHUNK_SIZE):
         for words_processor in backends:
             log.debug(f'Using processor {words_processor} for words {words_chunk}')
-            sure_correct, sure_with_typo_info, unknown = words_processor(words_chunk, backend_config)
+            _, sure_with_typo_info, unknown = words_processor(words_chunk)  # type: ignore
             typos_info += sure_with_typo_info
             # переопределяем переменную цикла так, чтобы следующему процессору доставались
             # только слова, по которым не известно, ок ли они
