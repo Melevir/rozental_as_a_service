@@ -4,8 +4,8 @@ from rozental_as_a_service.rozental import extract_all_constants_from_path, fetc
 
 
 @pytest.mark.parametrize('vocabulary_path, expected_typos', [
-    (None, ['бджета', 'ркеламную', 'содание']),
-    ('tests/test_files/.vocabulary', ['бджета', 'содание']),
+    (None, ['бджета', 'ркеламную', 'содание', 'созадет']),
+    ('tests/test_files/.vocabulary', ['бджета', 'содание', 'созадет']),
 ])
 def test_finds_correct_py_files_typos(vocabulary_path, expected_typos):
     unique_words = extract_all_constants_from_path('tests/test_files/', [], process_dots=False, processes_amount=2)

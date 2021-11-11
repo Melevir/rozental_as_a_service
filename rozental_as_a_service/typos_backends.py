@@ -2,6 +2,7 @@ import os
 from typing import List, Tuple, Optional
 
 from requests import Response, get
+from autocorrect import Speller
 from sentry_sdk import capture_exception
 
 from rozental_as_a_service.common_types import TypoInfo
@@ -107,3 +108,29 @@ def _process_ya_speller_response(
             save_ya_speller_results_to_db(speller_result, words, db_path)
     typo_words = {t['original'] for t in typos_info}
     return typos_info, [w for w in words if w not in typo_words]
+
+
+class AutocorrectCheckerBackend:
+    def __init__(self) -> None:
+        self.checker = Speller('ru', fast=True)
+
+    def __call__(self, words: List[str]) -> Tuple[List[str], List[TypoInfo], List[str]]:
+        incorrect_typos_info: List[TypoInfo] = []
+        known: List[str] = []
+        unknown: List[str] = []
+        for word in words:
+            if self.checker.existing([word]):
+                known.append(word)
+                continue
+            candidates = [
+                candidate[1] for candidate in sorted(
+                    self.checker.get_candidates(word), key=lambda item: item[0],
+                )
+            ]
+            incorrect_typos_info.append(
+                {
+                    'original': word,
+                    'possible_options': candidates,
+                },
+            )
+        return known, incorrect_typos_info, unknown

@@ -23,7 +23,7 @@ from rozental_as_a_service.obscene_utils import (
     fetch_obscene_words_base_if_necessary,
 )
 from rozental_as_a_service.typos_backends import (
-    process_with_vocabulary, YaSpellerBackend,
+    process_with_vocabulary, YaSpellerBackend, AutocorrectCheckerBackend,
 )
 from rozental_as_a_service.files_utils import get_all_filepathes_recursively, get_content_from_file
 from rozental_as_a_service.strings_extractors import (
@@ -118,6 +118,7 @@ def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, d
     backends = [
         functools.partial(process_with_vocabulary, vocabulary_path=vocabulary_path),
         YaSpellerBackend(db_path=db_path),
+        AutocorrectCheckerBackend(),
     ]
     for words_chunk in chunks(string_constants, DEFAULT_WORDS_CHUNK_SIZE):
         for words_processor in backends:
