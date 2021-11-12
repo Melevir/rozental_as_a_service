@@ -18,6 +18,7 @@ class RozentalOptions(TypedDict):
     processes_amount: int
     verbosity: int
     ban_obscene_words: bool
+    backends: List[str]
 
 
 GoogleDocumentContent = Mapping[str, Any]

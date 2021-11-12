@@ -33,7 +33,7 @@ from rozental_as_a_service.strings_extractors import (
 )
 
 if False:  # TYPE_CHECKING
-    from typing import List, Callable, DefaultDict
+    from typing import List, Callable, DefaultDict, Tuple
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 logging.getLogger('urllib3').setLevel(logging.INFO)
@@ -112,18 +112,13 @@ def extract_all_constants_from_files(
     return extract_words(list(set(string_constants)))
 
 
-def fetch_typos_info(string_constants: List[str], vocabulary_path: str = None, db_path: str = None) -> List[TypoInfo]:
+def fetch_typos_info(string_constants: List[str], backends: List[Callable[[List[str]], Tuple]]) -> List[TypoInfo]:
     typos_info: List[TypoInfo] = []
 
-    backends = [
-        functools.partial(process_with_vocabulary, vocabulary_path=vocabulary_path),
-        YaSpellerBackend(db_path=db_path),
-        AutocorrectCheckerBackend(),
-    ]
     for words_chunk in chunks(string_constants, DEFAULT_WORDS_CHUNK_SIZE):
         for words_processor in backends:
             log.debug(f'Using processor {words_processor} for words {words_chunk}')
-            _, sure_with_typo_info, unknown = words_processor(words_chunk)  # type: ignore
+            _, sure_with_typo_info, unknown = words_processor(words_chunk)
             typos_info += sure_with_typo_info
             # переопределяем переменную цикла так, чтобы следующему процессору доставались
             # только слова, по которым не известно, ок ли они
@@ -175,7 +170,23 @@ def main() -> None:
         arguments['verbosity'],
     )
 
-    typos_info = fetch_typos_info(unique_words, arguments['vocabulary_path'], arguments['db_path'])
+    available_backends: List[Tuple[str, Callable]] = [
+        ('vocabulary', functools.partial(process_with_vocabulary, vocabulary_path=arguments['vocabulary_path'])),
+        ('yaspeller', YaSpellerBackend(db_path=arguments['db_path'])),
+        ('autocorrect', AutocorrectCheckerBackend()),
+    ]
+    available_backend_names = [available_backend[0] for available_backend in available_backends]
+    for backend_name in arguments['backends']:
+        if backend_name not in available_backend_names:
+            raise Exception(f'Неизвестный бекенд {backend_name}')
+
+    backends: List[Callable] = [
+        backend
+        for backend_name, backend in available_backends
+        if backend_name in arguments['backends']
+    ]
+
+    typos_info = fetch_typos_info(unique_words, backends)
     found_obscene_words = None
     if arguments['ban_obscene_words']:
         fetch_obscene_words_base_if_necessary(arguments['db_path'])
