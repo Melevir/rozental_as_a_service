@@ -1,6 +1,10 @@
 import os
 from typing import List, Tuple, Optional
 
+import json
+import pathlib
+import tarfile
+from contextlib import closing
 from requests import Response, get
 from autocorrect import Speller
 from sentry_sdk import capture_exception
@@ -8,6 +12,9 @@ from sentry_sdk import capture_exception
 from rozental_as_a_service.common_types import TypoInfo
 from rozental_as_a_service.config import YA_SPELLER_REQUEST_TIMEOUTS, YA_SPELLER_RETRIES_COUNT
 from rozental_as_a_service.db_utils import save_ya_speller_results_to_db, get_ya_speller_cache_from_db
+
+
+PATH = os.path.abspath(os.path.dirname(__file__))
 
 
 def process_with_vocabulary(
@@ -112,7 +119,10 @@ def _process_ya_speller_response(
 
 class AutocorrectCheckerBackend:
     def __init__(self) -> None:
-        self.checker = Speller('ru', fast=True)
+        archive_path = pathlib.Path(PATH, 'data', 'ru.tar.gz')
+        with closing(tarfile.open(archive_path, 'r:gz')) as tarf, closing(tarf.extractfile('word_count.json')) as file:
+            nlp_data = json.load(file)  # type: ignore
+        self.checker = Speller('ru', fast=True, nlp_data=nlp_data)
 
     def __call__(self, words: List[str]) -> Tuple[List[str], List[TypoInfo], List[str]]:
         incorrect_typos_info: List[TypoInfo] = []
@@ -127,6 +137,9 @@ class AutocorrectCheckerBackend:
                     self.checker.get_candidates(word), key=lambda item: item[0],
                 )
             ]
+            if word == candidates[0]:
+                known.append(word)
+                continue
             incorrect_typos_info.append(
                 {
                     'original': word,
