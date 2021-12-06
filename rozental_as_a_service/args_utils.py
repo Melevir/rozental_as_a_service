@@ -53,6 +53,12 @@ def parse_args() -> argparse.Namespace:
         '--ban_obscene_words', '-obs',
         action='store_true',
         help='Считать вхождения мата за ошибки.')
+    parser.add_argument(
+        '--backends', '-b',
+        default='vocabulary,yaspeller',
+        help='Список бэкендов, которые использовать для проверки, '
+             'через запятую, доступные бэкенды: vocabulary, yaspeller, autocorrect.',
+    )
 
     return parser.parse_args()
 
@@ -86,6 +92,7 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
     process_dots = argparse_args.process_dots or config.get('process_dots') or False
     reorder_vocabulary = argparse_args.reorder_vocabulary or config.get('reorder_vocabulary') or False
     ban_obscene_words = argparse_args.ban_obscene_words or config.get('ban_obscene_words') or False
+    backends = argparse_args.backends.split(',')
 
     return {
         'path': argparse_args.path,
@@ -98,4 +105,5 @@ def prepare_arguments(argparse_args: argparse.Namespace) -> RozentalOptions:
         'processes_amount': processes_amount,
         'verbosity': verbosity,
         'ban_obscene_words': ban_obscene_words,
+        'backends': backends,
     }

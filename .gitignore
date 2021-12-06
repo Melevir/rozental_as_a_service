@@ -128,3 +128,5 @@ token.pickle
 coverage*
 .coverage*
 .rozental.sqlite
+ruwiki-latest-pages-articles.xml
+rozental_as_a_service/data/word_count.json

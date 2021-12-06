@@ -48,6 +48,8 @@ setup(
         'esprima==4.0.1',
         'mypy-extensions>=0.4.1',
         'sentry-sdk>=0.14.3',
+        'chardet',
+        'autocorrect',
     ],
     entry_points={
         'console_scripts': [
