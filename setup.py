@@ -34,6 +34,9 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     packages=find_packages(),
+    package_data={
+        "": ["*.gz"],
+    },
     include_package_data=True,
     keywords='typos',
     version=get_version(),
