@@ -178,7 +178,7 @@ def main() -> None:
     available_backend_names = [available_backend[0] for available_backend in available_backends]
     for backend_name in arguments['backends']:
         if backend_name not in available_backend_names:
-            raise Exception(f'Неизвестный бекенд {backend_name}')
+            raise Exception(f'Неизвестный бэкенд {backend_name}')
 
     backends: List[Callable] = [
         backend
