@@ -101,5 +101,5 @@ $ rozental test.py
 Мы соблюдаем [правила поведения Django](https://www.djangoproject.com/conduct/)
 и [стайлгайд BestDoctor](https://github.com/best-doctor/guides/blob/master/guides/python_styleguide.md).
 
-Если хотите принять участие в разработке – напишите [Илье в Телеграм](https://t.me/melevir),
+Если хотите принять участие в разработке – напишите [Илье в Телеграмм](https://t.me/melevir),
 он всё расскажет. Я пишу о себе в третьем лице, ну отлично.
