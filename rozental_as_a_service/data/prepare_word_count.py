@@ -6,14 +6,14 @@
     - в word_regex добавлен дефис, чтобы добавлялись слова вида "кто-то"
     - выкидываются слова с threshold < 10
 """
-from typing import Optional
+from typing import Generator, Optional
 import sys
 import json
 import re
 from collections import Counter, OrderedDict
 
 
-def get_words(filename: str, encd: str):
+def get_words(filename: str, encd: Optional[str]) -> Generator:
     word_regex = r'[АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя-]+'
     capitalized_regex = r'(\.|^|<|"|\'|\(|\[|\{)\s*' + word_regex
     with open(filename, encoding=encd) as file:
